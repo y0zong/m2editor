@@ -3,9 +3,10 @@ import { relative, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import dts from 'vite-plugin-dts'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), dts({entryRoot: 'src'})],
   build: {
     copyPublicDir: false,
     cssCodeSplit: true,
