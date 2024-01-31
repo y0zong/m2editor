@@ -63,8 +63,11 @@ function ReactApp() {
             console.log("changed!")
         }
     }
+
+    const content = { "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] }
+
     const { target } = useProseMirror({
-        doc, plugins, schema, handlerOnChange
+        doc, plugins, schema, handlerOnChange, content
     })
     return <div ref={target}></div>
 }

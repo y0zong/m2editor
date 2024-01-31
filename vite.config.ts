@@ -2,11 +2,13 @@ import { glob } from 'glob'
 import { relative, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
+import terser from 'terser'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
+import strip from '@rollup/plugin-strip'
 
 export default defineConfig({
-  plugins: [react(), dts({entryRoot: 'src'})],
+  plugins: [react(), dts({ entryRoot: 'src' })],
   build: {
     copyPublicDir: false,
     cssCodeSplit: true,
@@ -30,6 +32,10 @@ export default defineConfig({
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
       external: [/prosemirror-\S+/, 'react', 'react-dom'],
+      plugins: [strip({
+        include: ['**/*.ts'],
+        labels: ['debug'],
+      })]
     },
   },
 })
