@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client"
-import React, { StrictMode, useEffect, useState } from "react"
-import { EditorView } from "prosemirror-view"
+import React, { StrictMode } from "react"
 import { EditorState } from "prosemirror-state"
 import { Schema } from "prosemirror-model"
 import { addListNodes } from "prosemirror-schema-list"
@@ -57,14 +56,6 @@ function ReactApp() {
         layout(template)
     ]
 
-    const [content, setContent] = useState(undefined)
-
-    // if (!content) {
-    //     setInterval(() => {
-    //         setContent({ "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] })
-    //     }, 1000)
-    // }
-
     const { target, editor } = useProseMirror({
         doc, plugins, schema, handlerOnChange(editor, pre) {
             if (!editor.state.doc.eq(pre.doc)) {
@@ -77,11 +68,6 @@ function ReactApp() {
         const doc = editor.current?.state.schema.nodeFromJSON({ "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] })
         editor.current?.updateState(EditorState.create({ doc, plugins, schema }))
     }, 2000)
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         console.log('1>', target, editor)
-    //     }, 2000)
-    // }, [])
 
     return <div ref={target}></div>
 }
