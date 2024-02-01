@@ -34,6 +34,5 @@ export const layout_doc = (template: Template, schema: Schema, json?: any | null
     template.map(([line, type, attrs]) => {
         doc.content[line] = { type: type.name, content: [], attrs }
     })
-    console.log(Node.fromJSON(schema, doc), doc)
     return Node.fromJSON(schema, doc)
 }
