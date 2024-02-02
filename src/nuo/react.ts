@@ -9,11 +9,15 @@ export interface ProseMirrorConfig extends EditorStateConfig {
     handlerOnChange: (editor: EditorView, pre: EditorState) => void
 }
 export function useProseMirror(config: ProseMirrorConfig) {
-    let { handlerOnChange, ...rest } = config
-    rest.plugins = (rest.plugins || []).concat(changed(handlerOnChange))
     const target = useRef(null)
-    const editor = useRef<EditorView|null>(null)
-    const builder = useCallback((dom: HTMLElement|null) => new EditorView(dom, { state: EditorState.create(rest) }), [])
+    const editor = useRef<EditorView | null>(null)
+    const builder = useCallback((dom: HTMLElement) => {
+        let { handlerOnChange, ...rest } = config
+        rest.plugins = (rest.plugins || []).concat(changed(handlerOnChange))
+        const state = EditorState.create(rest)
+        console.log(state)
+        return new EditorView(dom, { state })
+    }, [])
 
     useEffect(() => {
         if (target.current) {

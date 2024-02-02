@@ -64,9 +64,10 @@ function ReactApp() {
         }
     })
     setTimeout(() => {
-        console.log('1>', target, editor)
         const doc = editor.current?.state.schema.nodeFromJSON({ "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] })
-        editor.current?.updateState(EditorState.create({ doc, plugins, schema }))
+        console.log('1>', editor.current?.state)
+        const { plugins, schema } = editor.current!.state
+        editor.current?.updateState(EditorState.create({ plugins, schema, doc }))
     }, 2000)
 
     return <div ref={target}></div>
