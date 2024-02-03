@@ -2,7 +2,6 @@ import { glob } from 'glob'
 import { relative, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
-import terser from 'terser'
 import react from '@vitejs/plugin-react'
 import dts from 'vite-plugin-dts'
 import strip from '@rollup/plugin-strip'
@@ -34,7 +33,7 @@ export default defineConfig({
       external: [/prosemirror-\S+/, 'react', 'react-dom'],
       plugins: [strip({
         include: ['**/*.ts'],
-        labels: ['debug'],
+        labels: ['debug', 'test'],
       })]
     },
   },

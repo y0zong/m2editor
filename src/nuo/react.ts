@@ -1,29 +1,31 @@
 import { EditorState, EditorStateConfig } from "prosemirror-state"
 import { DirectEditorProps, EditorView } from "prosemirror-view"
 import { useRef, useEffect } from "react"
+import { EventEmitter } from "eventemitter3"
 import { changed } from "./plugin/changed"
 import "prosemirror-view/style/prosemirror.css"
 import "./prosemirror.css"
 
-export interface ProseMirrorConfig extends Omit<DirectEditorProps, "state">, EditorStateConfig {
-    handlerOnChange: (editor: EditorView, pre: EditorState) => void
+export interface ProseMirrorConfig extends Omit<DirectEditorProps, "state">, EditorStateConfig { }
+
+interface ProseMirrorEvent {
+    changed: [EditorState]
 }
-export function useProseMirror(config: ProseMirrorConfig, content?: object, deps?: React.DependencyList) {
+
+export function useProseMirror(config: ProseMirrorConfig, content?: object) {
     const target = useRef(null)
     const editor = useRef<EditorView | null>(null)
-
-    useEffect(() => {
-        if (editor.current && !editor.current?.isDestroyed) {
-            let plugins = editor.current.state.plugins.slice() || []
-            plugins[0] = changed(config.handlerOnChange)
-            editor.current.updateState(editor.current.state.reconfigure({ plugins }))
-        }
-    }, deps)
+    const eEmitter = useRef(new EventEmitter<ProseMirrorEvent>())
 
     useEffect(() => {
         if (target.current) {
-            let { plugins, schema, storedMarks, selection, doc, handlerOnChange, ...props } = config
-            plugins = [changed(handlerOnChange)].concat(plugins || [])
+            let { plugins, schema, storedMarks, selection, doc, ...props } = config
+            const handler = (editor: EditorView, pre: EditorState) => {
+                if (!editor.state.doc.eq(pre.doc)) {
+                    eEmitter.current.emit("changed", editor.state)
+                }
+            }
+            plugins = [changed(handler)].concat(plugins || [])
             const state = EditorState.create({ plugins, schema, storedMarks, selection, doc })
             editor.current = new EditorView(target.current, { state, ...props })
         }
@@ -40,5 +42,5 @@ export function useProseMirror(config: ProseMirrorConfig, content?: object, deps
         }
     }, [content])
 
-    return { target, editor }
+    return { target, editor, emitter: eEmitter.current }
 }

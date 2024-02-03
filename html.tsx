@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { EditorState } from "prosemirror-state"
 import { Schema } from "prosemirror-model"
 import { addListNodes } from "prosemirror-schema-list"
@@ -31,15 +31,24 @@ function ReactApp() {
     let data = useAPI()
     let [test, setTest] = useState<any>(null)
     let [test2, setTest2] = useState<any>(null)
-    let handlerOnChange = (editor: EditorView, pre: EditorState) => {
+    const handlerOnChange = useCallback((editor: EditorView, pre: EditorState) => {
         if (!editor.state.doc.eq(pre.doc)) {
-            console.log("changed!", test, test2, setTest2)
-            setTest(1)
+            console.log("changed!", data)
+            // setTest(1)
             // setTimeout(() => {
             //     setTest2(2)
             // }, 2000)
         }
-    }
+    }, [])
+    // let handlerOnChange = (editor: EditorView, pre: EditorState) => {
+    //     if (!editor.state.doc.eq(pre.doc)) {
+    //         console.log("changed!", test, test2, setTest2)
+    //         setTest(1)
+    //         // setTimeout(() => {
+    //         //     setTest2(2)
+    //         // }, 2000)
+    //     }
+    // }
     const schema = new Schema({
         nodes: addListNodes(basic.schema.spec.nodes, "paragraph block*", "block"),
         marks: basic.schema.spec.marks
@@ -65,10 +74,19 @@ function ReactApp() {
         layout(template)
     ]
 
-    const { target, editor } = useProseMirror({
-        doc, plugins, schema, handlerOnChange
-    }, data, [data, test, test2])
-    console.log("update", editor)
+    const { target, editor, emitter } = useProseMirror({
+        doc, plugins, schema
+    }, data)
+
+    useEffect(() => {
+        emitter.on("changed", state => {
+            console.log("changed!", state.doc)
+            console.log(data)
+        })
+        return () => {
+            emitter.removeListener("changed")
+        }
+    }, [data])
 
     return <div ref={target}></div>
 }
