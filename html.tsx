@@ -1,6 +1,5 @@
 import { createRoot } from "react-dom/client"
-import React, { useCallback, useEffect, useState } from "react"
-import { EditorState } from "prosemirror-state"
+import React, { useEffect, useState } from "react"
 import { Schema } from "prosemirror-model"
 import { addListNodes } from "prosemirror-schema-list"
 import * as basic from "prosemirror-schema-basic"
@@ -13,7 +12,6 @@ import { inputRules, smartQuotes, emDash, ellipsis } from "prosemirror-inputrule
 import { Template, layout, layout_doc } from "./src/nuo/plugin/layout.ts"
 import { blockQuoteRule, bulletListRule, codeBlockRule, headingRule, imageRule, orderedListRule } from "./src/nuo/inputrule/basic.ts"
 import { useProseMirror } from "./src/nuo/react.ts"
-import { EditorView } from "prosemirror-view"
 
 
 function useAPI() {
@@ -29,26 +27,11 @@ function useAPI() {
 // note: ProseMirror
 function ReactApp() {
     let data = useAPI()
+    // @ts-ignore
     let [test, setTest] = useState<any>(null)
+    // @ts-ignore
     let [test2, setTest2] = useState<any>(null)
-    const handlerOnChange = useCallback((editor: EditorView, pre: EditorState) => {
-        if (!editor.state.doc.eq(pre.doc)) {
-            console.log("changed!", data)
-            // setTest(1)
-            // setTimeout(() => {
-            //     setTest2(2)
-            // }, 2000)
-        }
-    }, [])
-    // let handlerOnChange = (editor: EditorView, pre: EditorState) => {
-    //     if (!editor.state.doc.eq(pre.doc)) {
-    //         console.log("changed!", test, test2, setTest2)
-    //         setTest(1)
-    //         // setTimeout(() => {
-    //         //     setTest2(2)
-    //         // }, 2000)
-    //     }
-    // }
+
     const schema = new Schema({
         nodes: addListNodes(basic.schema.spec.nodes, "paragraph block*", "block"),
         marks: basic.schema.spec.marks
@@ -74,6 +57,7 @@ function ReactApp() {
         layout(template)
     ]
 
+    // @ts-ignore
     const { target, editor, emitter } = useProseMirror({
         doc, plugins, schema
     }, data)
