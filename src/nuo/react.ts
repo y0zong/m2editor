@@ -8,15 +8,15 @@ import "./prosemirror.css"
 export interface ProseMirrorConfig extends Omit<DirectEditorProps, "state">, EditorStateConfig {
     handlerOnChange: (editor: EditorView, pre: EditorState) => void
 }
-export function useProseMirror(config: ProseMirrorConfig, content: object, deps?: React.DependencyList) {
+export function useProseMirror(config: ProseMirrorConfig, content?: object, deps?: React.DependencyList) {
     const target = useRef(null)
     const editor = useRef<EditorView | null>(null)
 
     useEffect(() => {
-        if (editor.current) {
+        if (editor.current && !editor.current?.isDestroyed) {
             let plugins = editor.current.state.plugins.slice() || []
             plugins[0] = changed(config.handlerOnChange)
-            editor.current.updateState(editor.current?.state.reconfigure({ plugins }))
+            editor.current.updateState(editor.current.state.reconfigure({ plugins }))
         }
     }, deps)
 
@@ -33,7 +33,7 @@ export function useProseMirror(config: ProseMirrorConfig, content: object, deps?
     }, [target])
 
     useEffect(() => {
-        if (editor.current && content) {
+        if (editor.current && !editor.current?.isDestroyed && content) {
             let node = editor.current.state.schema.nodeFromJSON(content)
             let tr = editor.current.state.tr.replaceWith(0, editor.current.state.doc.content.size, node)
             editor.current.dispatch(tr)
