@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client"
-import React, { StrictMode } from "react"
+import React, { useEffect, useState } from "react"
 import { EditorState } from "prosemirror-state"
 import { Schema } from "prosemirror-model"
 import { addListNodes } from "prosemirror-schema-list"
@@ -13,24 +13,33 @@ import { inputRules, smartQuotes, emDash, ellipsis } from "prosemirror-inputrule
 import { Template, layout, layout_doc } from "./src/nuo/plugin/layout.ts"
 import { blockQuoteRule, bulletListRule, codeBlockRule, headingRule, imageRule, orderedListRule } from "./src/nuo/inputrule/basic.ts"
 import { useProseMirror } from "./src/nuo/react.ts"
+import { EditorView } from "prosemirror-view"
 
-// function useEditor(config: Omit<EditorConfig, "target">) {
-//     let editor: Editor | null = null
-//     const target = useRef(null)
-//     useEffect(() => {
-//         if (target.current) {
-//             editor = new Editor({
-//                 target: target.current,
-//                 ...config
-//             })
-//         }
-//     })
 
-//     return { target, editor }
-// }
+function useAPI() {
+    const [data, setData] = useState<any>(null)
+    useEffect(() => {
+        setTimeout(() => {
+            setData({ "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] })
+        }, 2000)
+    }, [])
+    return data
+}
 
 // note: ProseMirror
 function ReactApp() {
+    let data = useAPI()
+    let [test, setTest] = useState<any>(null)
+    let [test2, setTest2] = useState<any>(null)
+    let handlerOnChange = (editor: EditorView, pre: EditorState) => {
+        if (!editor.state.doc.eq(pre.doc)) {
+            console.log("changed!", test, test2, setTest2)
+            setTest(1)
+            // setTimeout(() => {
+            //     setTest2(2)
+            // }, 2000)
+        }
+    }
     const schema = new Schema({
         nodes: addListNodes(basic.schema.spec.nodes, "paragraph block*", "block"),
         marks: basic.schema.spec.marks
@@ -57,21 +66,13 @@ function ReactApp() {
     ]
 
     const { target, editor } = useProseMirror({
-        doc, plugins, schema, handlerOnChange(editor, pre) {
-            if (!editor.state.doc.eq(pre.doc)) {
-                console.log("changed!", target.current)
-            }
-        }
-    })
-    setTimeout(() => {
-        const doc = editor.current?.state.schema.nodeFromJSON({ "type": "doc", "content": [{ "type": "heading", "attrs": { "level": 1 }, "content": [{ "type": "text", "text": "feagryafsefs" }] }, { "type": "paragraph", "content": [{ "type": "text", "text": "/" }] }] })
-        console.log('1>', editor.current?.state)
-        const { plugins, schema } = editor.current!.state
-        editor.current?.updateState(EditorState.create({ plugins, schema, doc }))
-    }, 2000)
+        doc, plugins, schema, handlerOnChange
+    }, data, [data, test, test2])
+    console.log("update", editor)
 
     return <div ref={target}></div>
 }
 
 createRoot(document.getElementById("app")!)
-    .render(<StrictMode><ReactApp /></StrictMode>)
+    // .render(<StrictMode><ReactApp /></StrictMode>)
+    .render(<ReactApp />)

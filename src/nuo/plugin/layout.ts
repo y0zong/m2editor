@@ -10,19 +10,22 @@ export const layout = (template: Template) => new Plugin({
     view() {
         return {
             update(view) {
-                template.map(([line, type, attrs]) => {
-                    let child = view.state.doc.content.maybeChild(line)
-                    if (child?.type === type) return view.state
+                if (view.state.tr.docChanged) {
+                    template.map(([line, type, attrs]) => {
+                        let child = view.state.doc.content.maybeChild(line)
+                        if (child?.type === type) return view.state
 
-                    let pos = child!.resolve(line)
-                    if (child!.isText || child!.isTextblock) {
-                        let start = pos.start(0)
-                        let end = start + (child?.nodeSize || 0)
-                        view.dispatch(view.state.tr.replaceWith(start, end, type.create(attrs, child!.textContent ? view.state.schema.text(child!.textContent) : null)))
-                    } else {
-                        view.dispatch(view.state.tr.insert(line, type.create(attrs, null)))
-                    }
-                })
+                        let pos = child!.resolve(line)
+                        if (child!.isText || child!.isTextblock) {
+                            let start = pos.start(0)
+                            let end = start + (child?.nodeSize || 0)
+                            console.log(start, end)
+                            view.dispatch(view.state.tr.replaceWith(start, end, type.create(attrs, child!.textContent ? view.state.schema.text(child!.textContent) : null)))
+                        } else {
+                            view.dispatch(view.state.tr.insert(line, type.create(attrs, null)))
+                        }
+                    })
+                }
             },
         }
     },
