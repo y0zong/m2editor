@@ -9,7 +9,7 @@ import "./prosemirror.css"
 export interface ProseMirrorConfig extends Omit<DirectEditorProps, "state">, EditorStateConfig { }
 
 interface ProseMirrorEvent {
-    changed: [EditorState]
+    changed: (state: EditorState) => void
 }
 
 export function useProseMirror(config: ProseMirrorConfig, content?: object) {
