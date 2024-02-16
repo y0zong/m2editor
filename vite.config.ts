@@ -30,7 +30,7 @@ export default defineConfig({
     },
     rollupOptions: {
       // 确保外部化处理那些你不想打包进库的依赖
-      external: [/prosemirror-\S+/, 'react', 'react-dom'],
+      external: [/prosemirror-\S+/, 'react', 'react-dom', 'eventemitter3', 'jsdom'],
       plugins: [strip({
         include: ['**/*.ts'],
         labels: ['debug', 'test'],
